@@ -11,6 +11,8 @@ export default function Filters() {
     const [meals, setMeals] = useState([]);
     const [sortBy, setSortBy] = useState(null);
     const [sortedMeals, setSortedMeals] = useState([]);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [modalMeal, setModalMeal] = useState(null);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -64,6 +66,7 @@ export default function Filters() {
                 .then(mealsWithCategory => {
                     setMeals(mealsWithCategory);
                     setIsOpen(false);
+                    setSortBy('');
                 })
                 .catch(error => {
                     console.log('Error fetching selected area meals');
@@ -98,10 +101,36 @@ export default function Filters() {
             })
     }, []);
 
+    // useEffect(() => {
+    //     const sortedMeals = [...meals];
+    //     if (sortBy === 'descending') {
+    //         sortedMeals.sort((a, b) => b.strMeal.localecompare(a.strMeal));
+    //     } else {
+    //         sortedMeals.sort((a, b) => a.strMeal.localecompare(b.strMeal));
+    //     }
+    //     setMeals(sortedMeals);
+    // }, [sortBy, meals]);
 
+    // const handleSortByChange = () => {
+    //     setSortBy();
+    // }
 
+    const handleSortByChange = (event) => {
+        setSortBy(event.target.value);
+    };
 
+    useEffect(() => {
+        if (sortBy === 'ascending') {
+            setMeals(prevMeals => [...prevMeals].sort((a, b) => a.strMeal.localeCompare(b.strMeal)));
+        } else if (sortBy === 'descending') {
+            setMeals(prevMeals => [...prevMeals].sort((a, b) => b.strMeal.localeCompare(a.strMeal)));
+        }
+    }, [sortBy]);
 
+    const toggleModal = (meal) => {
+        setModalMeal(meal);
+        setIsPopupOpen(!isPopupOpen);
+    };
 
     return (
         <div className='py-5'>
@@ -126,6 +155,7 @@ export default function Filters() {
                         <div className='mr-2'>Selected Areas : {selectedArea.join(', ')}</div>
                     )}
                 </div> */}
+                <SortDropdown handleSortByChange={handleSortByChange} />
 
                 <button className="border border-solid border-gray-300  filter-btn">
                     Fast Delivery
@@ -146,9 +176,18 @@ export default function Filters() {
                     ))
 
                 )}
-
-
             </div>
+            {isPopupOpen && (
+                <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-8 rounded-lg">
+                        {/* Display modal content with meal details */}
+                        <h2 className="text-2xl font-bold mb-4">{modalMeal.strMeal}</h2>
+                        <img src={modalMeal.strMealThumb} alt={modalMeal.strMeal} className="w-full mb-4" />
+                        <p>{modalMeal.strInstructions}</p>
+                        <button onClick={toggleModal} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">Close Modal</button>
+                    </div>
+                </div>
+            )}
         </div >
     )
 }
