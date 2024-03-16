@@ -5,7 +5,7 @@ const Meal = ({ meal }) => (
         <div class="meals-image rounded-2xl">
             <img className="object-cover" src={meal.strMealThumb} alt={meal.strMeal} />
         </div>
-        <div className="meals-details py-3 ml-3">
+        <div className="meals-details pt-3 ml-3">
             <h3 className="antialiased font-bold text-lg break-words">{meal.strMeal}</h3>
             <div className="meals-rating flex">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" role="img" aria-hidden="true">

@@ -4,6 +4,7 @@
 
 .header-shadow {
     box-shadow: 0 15px 40px -20px rgba(40, 44, 63, .15);
+    z-index: 999999;
 }
 
 .filter-btn {
@@ -33,4 +34,74 @@
 .meals-details h3,
 .meals-rating span {
     color: rgba(2, 6, 12, 0.75);
+}
+
+/* Custom styles for radio buttons */
+input[type="radio"] {
+    /* Hide the default radio button */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Style for unchecked radio button */
+input[type="radio"]:not(:checked)+label::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    /* Border color for unchecked radio button */
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* Style for checked radio button */
+input[type="radio"]:checked+label::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #F15700;
+    /* Orange border for checked radio button */
+    border-radius: 50%;
+    margin-right: 8px;
+    position: relative;
+}
+
+/* Orange circle in the middle of the checked radio button */
+input[type="radio"]:checked+label::before::after {
+    content: '';
+    display: block;
+    width: 8px;
+    /* Size of the orange circle */
+    height: 8px;
+    /* Size of the orange circle */
+    background-color: #F15700;
+    /* Orange color for the circle */
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+input[type="radio"]:checked+label::before::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+    border-radius: 50%;
+    background-color: #F15700;
+    /* Background color */
+}
+
+.color-orange {
+    color: #F15700;
+}
+
+.bg-orange {
+    background-color: #F15700;
 }
