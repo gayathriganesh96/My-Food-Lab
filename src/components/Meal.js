@@ -22,7 +22,7 @@ function Meal({ meal, toggleModal }) {
                     </svg>
                     <span className='ml-1 font-bold text-base'>{meal.rating}</span>
                 </div>
-                <p className="text-gray-500 mt-1 text-base">{meal.category}</p>
+                <p className="text-gray-500 mt-1 text-base">{meal.strCategory}</p>
             </div>
         </div>
     )

@@ -105,3 +105,26 @@ input[type="radio"]:checked+label::before::after {
 .bg-orange {
     background-color: #F15700;
 }
+
+.w-600 {
+    width: 600px;
+}
+
+ul.modal-ingredients {
+    display: block;
+}
+
+ul.modal-ingredients li {
+    display: inline;
+    overflow: inherit;
+}
+
+/* .modal-image {
+    height: 400px;
+    overflow: hidden;
+}
+
+.modal-image img.w-full.mb-4 {
+    height: auto;
+    width: 100%;
+} */

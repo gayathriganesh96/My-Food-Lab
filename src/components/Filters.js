@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AreasDropdown from './AreasDropdown';
 import Meal from './Meal';
 import SortDropdown from './SortDropdown';
+import Modal from './Modal';
 
 export default function Filters() {
 
@@ -15,6 +16,9 @@ export default function Filters() {
     const [modalMeal, setModalMeal] = useState(null);
     const [foodItems, setFoodItems] = useState([]);
     const [selectedFoodItem, setSelectedFoodItem] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(8); // Display 8 items per page
+
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -48,6 +52,41 @@ export default function Filters() {
         setSelectedArea([]);
     }
 
+    // const applyFilters = () => {
+    //     if (selectedArea.length > 0) {
+    //         Promise.all(selectedArea.map(area => (
+    //             fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${area}`)
+    //                 .then(response => response.json())
+    //         )))
+    //             .then(mealsData => {
+    //                 const mealPromises = mealsData.flatMap(data => data.meals).map(async meal => {
+    //                     const rating = (Math.random() * (5 - 3) + 3).toFixed(1);
+
+    //                     try {
+    //                         const menuItemResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${meal.strMeal}`);
+    //                         const menuItemData = await menuItemResponse.json();
+
+    //                         const menuItem = menuItemData.meals && menuItemData.meals.length > 0 ? menuItemData.meals[0].strDetails : '';
+    //                         return { ...meal, rating, menuItem };
+    //                     } catch (error) {
+    //                         console.error('Error fetching menu item details:', error);
+    //                         return { ...meal, rating, menuItem: 'Details not available' };
+    //                     }
+
+    //                 });
+    //                 return Promise.all(mealPromises);
+    //             })
+    //             .then(mealsWithCategory => {
+    //                 setMeals(mealsWithCategory);
+    //                 setIsOpen(false);
+    //                 setSortBy('');
+    //             })
+    //             .catch(error => {
+    //                 console.log('Error fetching selected area meals');
+    //             })
+    //     }
+    // }
+
     const applyFilters = () => {
         if (selectedArea.length > 0) {
             Promise.all(selectedArea.map(area => (
@@ -56,13 +95,19 @@ export default function Filters() {
             )))
                 .then(mealsData => {
                     const mealPromises = mealsData.flatMap(data => data.meals).map(async meal => {
-                        const categoryResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`);
-                        const categoryData = await categoryResponse.json();
-                        const category = categoryData.meals[0].strCategory;
                         const rating = (Math.random() * (5 - 3) + 3).toFixed(1);
 
+                        try {
+                            const menuItemResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(meal.strMeal)}`);
+                            const menuItemData = await menuItemResponse.json();
 
-                        return { ...meal, category, rating };
+                            // const menuItemDetails = menuItemData.meals && menuItemData.meals.length > 0 ? menuItemData.meals[0] : null;
+                            return { ...meal, rating, menuItemDetails: menuItemData.meals ? menuItemData.meals[0] : null };
+                        } catch (error) {
+                            console.error('Error fetching menu item details:', error);
+                            return { ...meal, rating, menuItemDetails: null };
+                        }
+
                     });
                     return Promise.all(mealPromises);
                 })
@@ -83,40 +128,26 @@ export default function Filters() {
             .then(response => response.json())
             .then(
                 data => {
-                    // setMeals(data.meals)
                     const mealPromises = data.meals.map(async meal => {
-                        const categoryResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`);
-                        const categoryData = await categoryResponse.json();
-
-                        //const rating = Math.floor(Math.random() * 5) + 1;
-                        // const rating = (Math.random() * (5 - 1) + 1).toFixed(1);
                         const rating = (Math.random() * (5 - 3) + 3).toFixed(1);
-                        return { ...meal, category: categoryData.meals[0].strCategory, rating };
-
-                        // return { ...meal, category: categoryData.meals[0].strCategory };
+                        try {
+                            const menuItemResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${meal.strMeal}`);
+                            const menuItemData = await menuItemResponse.json();
+                            //const menuItem = menuItemData.meals && menuItemData.meals.length > 0 ? menuItemData.meals[0].strDetails : '';
+                            console.log(menuItemData);
+                            return { ...meal, rating, menuItemDetails: menuItemData.meals ? menuItemData.meals[0] : null };
+                        } catch (error) {
+                            console.error('Error fetching menu item details:', error);
+                            return { ...meal, rating, menuItem: 'Details not available' };
+                        }
                     });
                     Promise.all(mealPromises).then(mealsWithCategory => setMeals(mealsWithCategory));
-
                 }
             )
             .catch(error => {
                 console.log('Error fetching Indian , meals', error);
             })
     }, []);
-
-    // useEffect(() => {
-    //     const sortedMeals = [...meals];
-    //     if (sortBy === 'descending') {
-    //         sortedMeals.sort((a, b) => b.strMeal.localecompare(a.strMeal));
-    //     } else {
-    //         sortedMeals.sort((a, b) => a.strMeal.localecompare(b.strMeal));
-    //     }
-    //     setMeals(sortedMeals);
-    // }, [sortBy, meals]);
-
-    // const handleSortByChange = () => {
-    //     setSortBy();
-    // }
 
     const handleSortByChange = (event) => {
         setSortBy(event.target.value);
@@ -134,6 +165,15 @@ export default function Filters() {
         setModalMeal(meal);
         setIsPopupOpen(!isPopupOpen);
     };
+
+    // Pagination logic to slice the meals array based on the current page
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = meals.slice(indexOfFirstItem, indexOfLastItem);
+
+    // Function to handle page change
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 
     return (
         <div className='py-5'>
@@ -172,7 +212,7 @@ export default function Filters() {
             </div >
             <div className="grid grid-cols-4 gap-8 py-5 pt-10">
                 {meals !== null && (
-                    meals.map(meal => (
+                    currentItems.map(meal => (
                         <div key={meal.idMeal}>
                             <Meal key={meal.idMeal} meal={meal} toggleModal={toggleModal} />
                         </div>
@@ -181,53 +221,21 @@ export default function Filters() {
                 )}
             </div>
             {isPopupOpen && (
-                <div className="fixed top-5 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center" onClick={toggleModal}>
-                    <div className="bg-white p-8 rounded-lg " onClick={(e) => e.stopPropagation()}>
-                        <div className=' relative'>
-                            <h2 className="text-2xl font-bold mb-4">{modalMeal.strMeal}</h2>
-                            <button
-                                type="button"
-                                class="absolute top-0 right-0 p-2"
-                                data-twe-modal-dismiss
-                                onClick={toggleModal}
-                                aria-label="Close">
-                                <span class="[&>svg]:h-6 [&>svg]:w-6">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="#333333"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.5"
-                                        stroke="currentColor">
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </span>
-                            </button>
-                        </div>
-                        <img src={modalMeal.strMealThumb} alt={modalMeal.strMeal} className="w-full mb-4" />
-
-                        {/* <h3 className="antialiased font-bold text-lg break-words">{modalMeal.strMeal}</h3> */}
-                        <div className="meals-rating flex">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" role="img" aria-hidden="true">
-                                <circle cx="10" cy="10" r="9" fill="url(#paint0_linear)"></circle>
-                                <path d="M10.0816 12.865C10.0312 12.8353 9.96876 12.8353 9.91839 12.865L7.31647 14.3968C6.93482 14.6214 6.47106 14.2757 6.57745 13.8458L7.27568 11.0245C7.29055 10.9644 7.26965 10.9012 7.22195 10.8618L4.95521 8.99028C4.60833 8.70388 4.78653 8.14085 5.23502 8.10619L8.23448 7.87442C8.29403 7.86982 8.34612 7.83261 8.36979 7.77777L9.54092 5.06385C9.71462 4.66132 10.2854 4.66132 10.4591 5.06385L11.6302 7.77777C11.6539 7.83261 11.706 7.86982 11.7655 7.87442L14.765 8.10619C15.2135 8.14085 15.3917 8.70388 15.0448 8.99028L12.7781 10.8618C12.7303 10.9012 12.7095 10.9644 12.7243 11.0245L13.4225 13.8458C13.5289 14.2757 13.0652 14.6214 12.6835 14.3968L10.0816 12.865Z" fill="white"></path>
-                                <defs>
-                                    <linearGradient id="paint0_linear" x1="10" y1="1" x2="10" y2="19" gradientUnits="userSpaceOnUse">
-                                        <stop stop-color="#21973B"></stop>
-                                        <stop offset="1" stop-color="#128540"></stop>
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                            <span className='ml-1 font-bold text-base'>{modalMeal.rating}</span>
-                        </div>
-                        <p className="text-gray-500 mt-1 text-base">{modalMeal.category}</p>
-
-                        {/* <button onClick={toggleModal} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">Close Modal</button> */}
-                    </div>
-                </div>
+                <Modal isPopupOpen={isPopupOpen} toggleModal={toggleModal} modalMeal={modalMeal} />
             )}
+            <div className="pagination">
+                {meals.length > itemsPerPage && (
+                    <ul className="pagination-list">
+                        {Array.from({ length: Math.ceil(meals.length / itemsPerPage) }, (_, index) => (
+                            <li key={index} className="pagination-item">
+                                <button onClick={() => paginate(index + 1)} className="pagination-link">
+                                    {index + 1}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </div >
     )
 }
