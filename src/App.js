@@ -4,6 +4,7 @@ import 'tailwindcss/tailwind.css';
 import Header from './components/Header';
 import MealList from './components/MealList';
 import Filters from './components/Filters';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -12,9 +13,9 @@ function App() {
       <div className="container mx-auto">
         <div className="pt-20">
           <Filters />
-          {/* <MealList /> */}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
