@@ -225,10 +225,10 @@ export default function Filters() {
             )}
             <div className="pagination">
                 {meals.length > itemsPerPage && (
-                    <ul className="pagination-list">
+                    <ul className="pagination-list flex items-center -space-x-px h-8 text-sm">
                         {Array.from({ length: Math.ceil(meals.length / itemsPerPage) }, (_, index) => (
                             <li key={index} className="pagination-item">
-                                <button onClick={() => paginate(index + 1)} className="pagination-link">
+                                <button onClick={() => paginate(index + 1)} className="pagination-link flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                                     {index + 1}
                                 </button>
                             </li>
@@ -236,6 +236,10 @@ export default function Filters() {
                     </ul>
                 )}
             </div>
+
+
+
+
         </div >
     )
 }
