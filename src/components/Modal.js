@@ -3,40 +3,33 @@ import { useState } from 'react';
 
 
 function Modal({ isPopupOpen, toggleModal, modalMeal }) {
-    // console.log(modalMeal);
     const checkYouTubeVideoExists = async (videoId) => {
         try {
             const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=YOUR_API_KEY&part=snippet`);
             const data = await response.json();
-            return data.items.length > 0; // Returns true if video exists, false otherwise
+            return data.items.length > 0;
         } catch (error) {
             console.error('Error checking YouTube video:', error);
-            return false; // Assume video doesn't exist in case of error
+            return false;
         }
     };
 
     const [showAllContent, setShowAllContent] = useState(false);
 
     const instructions = modalMeal.menuItemDetails.strInstructions;
-
-    // Split the instructions into words
     const words = instructions.split(/\s+/);
-
-    // Determine if the content exceeds 50 words
     const isLongContent = words.length > 150;
-
-    // Display either the first 50 words or all content based on showAllContent state
     const displayContent = isLongContent && !showAllContent ? words.slice(0, 150).join(' ') + '...' : instructions;
 
     return (
         <>
             {isPopupOpen && (
                 <div className="fixed top-10 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center" onClick={toggleModal}>
-                    <div className="bg-white p-5 rounded-lg " onClick={(e) => e.stopPropagation()}>
-                        {/* <div className=' relative'>
+                    <div className="bg-white p-5 rounded-lg mob-height" onClick={(e) => e.stopPropagation()}>
+                        <div className=' relative'>
                             <button
                                 type="button"
-                                class="absolute top-0 right-0 p-2"
+                                class="absolute top-0 right-0 p-2 sm:hidden bg-white border-300-grey"
                                 data-twe-modal-dismiss
                                 onClick={toggleModal}
                                 aria-label="Close">
@@ -54,7 +47,7 @@ function Modal({ isPopupOpen, toggleModal, modalMeal }) {
                                     </svg>
                                 </span>
                             </button>
-                        </div> */}
+                        </div>
 
                         {modalMeal.menuItemDetails && (
 
@@ -72,7 +65,7 @@ function Modal({ isPopupOpen, toggleModal, modalMeal }) {
                                             allowFullScreen
                                         ></iframe>
                                     ) : (
-                                        <img src={modalMeal.strMealThumb} alt={modalMeal.strMeal} className="w-full mb-4 rounded-lg" />
+                                        <img src={modalMeal.strMealThumb} alt={modalMeal.strMeal} className="w-full h-96 mb-4 rounded-lg" />
                                     )}
                                 </div>
                                 <h2 className="text-base font-medium pt-2">{modalMeal.strMeal}</h2>
@@ -108,7 +101,6 @@ function Modal({ isPopupOpen, toggleModal, modalMeal }) {
                                         return null;
                                     })}
                                 </ul>
-                                {/* <p className="text-gray-500 mt-1 text-base">{modalMeal.menuItemDetails.strInstructions}</p> */}
                                 <p className="text-gray-500 mt-1 text-sm mb-3">
                                     {displayContent}
                                     {isLongContent && (

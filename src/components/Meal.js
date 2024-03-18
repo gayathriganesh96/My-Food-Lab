@@ -1,6 +1,5 @@
 import React from 'react';
 
-// const Meal = ({ meal, toggleModal }) => (
 function Meal({ meal, toggleModal }) {
     return (
         <div key={meal.idMeal} onClick={() => toggleModal(meal)}>

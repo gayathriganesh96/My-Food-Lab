@@ -27,7 +27,8 @@
 }
 
 .meals-image {
-    height: 222.5px;
+    min-height: auto;
+    max-height: 222.5px;
     overflow: hidden;
 }
 
@@ -36,49 +37,43 @@
     color: rgba(2, 6, 12, 0.75);
 }
 
-/* Custom styles for radio buttons */
+.filter-btn.selected {
+    border: 2px solid #F15700;
+}
+
 input[type="radio"] {
-    /* Hide the default radio button */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
 }
 
-/* Style for unchecked radio button */
 input[type="radio"]:not(:checked)+label::before {
     content: '';
     display: inline-block;
     width: 16px;
     height: 16px;
     border: 2px solid #ccc;
-    /* Border color for unchecked radio button */
     border-radius: 50%;
     margin-right: 8px;
 }
 
-/* Style for checked radio button */
 input[type="radio"]:checked+label::before {
     content: '';
     display: inline-block;
     width: 16px;
     height: 16px;
     border: 2px solid #F15700;
-    /* Orange border for checked radio button */
     border-radius: 50%;
     margin-right: 8px;
     position: relative;
 }
 
-/* Orange circle in the middle of the checked radio button */
 input[type="radio"]:checked+label::before::after {
     content: '';
     display: block;
     width: 8px;
-    /* Size of the orange circle */
     height: 8px;
-    /* Size of the orange circle */
     background-color: #F15700;
-    /* Orange color for the circle */
     border-radius: 50%;
     position: absolute;
     top: 50%;
@@ -107,7 +102,11 @@ input[type="radio"]:checked+label::before::after {
 }
 
 .w-600 {
-    width: 600px;
+    max-width: 600px;
+    min-width: 250px;
+    min-height: 500px;
+    max-height: 680px;
+    overflow: scroll;
 }
 
 ul.modal-ingredients {
@@ -119,12 +118,23 @@ ul.modal-ingredients li {
     overflow: inherit;
 }
 
-/* .modal-image {
-    height: 400px;
-    overflow: hidden;
-}
+@media only screen and (max-width: 812px) {
+    .container {
+        width: 92% !important;
+        margin: 0 auto;
+    }
 
-.modal-image img.w-full.mb-4 {
-    height: auto;
-    width: 100%;
-} */
+    .filter-btn {
+        margin: 5px;
+    }
+
+    .mob-height {
+        height: 450px;
+        overflow: scroll;
+    }
+
+    .logo-image {
+        width: 90px;
+        padding-right: 20px;
+    }
+}

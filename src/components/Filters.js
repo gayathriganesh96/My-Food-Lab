@@ -9,19 +9,19 @@ export default function Filters() {
     const [isOpen, setIsOpen] = useState(false);
     const [areas, setAreas] = useState([]);
     const [selectedArea, setSelectedArea] = useState([]);
+    const [selected, setSelected] = useState(false);
     const [meals, setMeals] = useState([]);
     const [sortBy, setSortBy] = useState(null);
-    const [sortedMeals, setSortedMeals] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [modalMeal, setModalMeal] = useState(null);
     const [foodItems, setFoodItems] = useState([]);
-    const [selectedFoodItem, setSelectedFoodItem] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(8); // Display 8 items per page
+    const [itemsPerPage] = useState(12);
 
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
+        setSelected(!selected);
     }
 
     useEffect(() => {
@@ -39,8 +39,6 @@ export default function Filters() {
 
 
     const handleAreaSelection = (area) => {
-        console.log('selected', area);
-        // setSelectedArea(area);
         if (selectedArea.includes(area)) {
             setSelectedArea(prevSelectedArea => [...prevSelectedArea.filter(selectedArea => selectedArea !== area)]);
         } else {
@@ -51,41 +49,6 @@ export default function Filters() {
     const clearSelection = () => {
         setSelectedArea([]);
     }
-
-    // const applyFilters = () => {
-    //     if (selectedArea.length > 0) {
-    //         Promise.all(selectedArea.map(area => (
-    //             fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${area}`)
-    //                 .then(response => response.json())
-    //         )))
-    //             .then(mealsData => {
-    //                 const mealPromises = mealsData.flatMap(data => data.meals).map(async meal => {
-    //                     const rating = (Math.random() * (5 - 3) + 3).toFixed(1);
-
-    //                     try {
-    //                         const menuItemResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${meal.strMeal}`);
-    //                         const menuItemData = await menuItemResponse.json();
-
-    //                         const menuItem = menuItemData.meals && menuItemData.meals.length > 0 ? menuItemData.meals[0].strDetails : '';
-    //                         return { ...meal, rating, menuItem };
-    //                     } catch (error) {
-    //                         console.error('Error fetching menu item details:', error);
-    //                         return { ...meal, rating, menuItem: 'Details not available' };
-    //                     }
-
-    //                 });
-    //                 return Promise.all(mealPromises);
-    //             })
-    //             .then(mealsWithCategory => {
-    //                 setMeals(mealsWithCategory);
-    //                 setIsOpen(false);
-    //                 setSortBy('');
-    //             })
-    //             .catch(error => {
-    //                 console.log('Error fetching selected area meals');
-    //             })
-    //     }
-    // }
 
     const applyFilters = () => {
         if (selectedArea.length > 0) {
@@ -101,7 +64,6 @@ export default function Filters() {
                             const menuItemResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(meal.strMeal)}`);
                             const menuItemData = await menuItemResponse.json();
 
-                            // const menuItemDetails = menuItemData.meals && menuItemData.meals.length > 0 ? menuItemData.meals[0] : null;
                             return { ...meal, rating, menuItemDetails: menuItemData.meals ? menuItemData.meals[0] : null };
                         } catch (error) {
                             console.error('Error fetching menu item details:', error);
@@ -134,7 +96,6 @@ export default function Filters() {
                             const menuItemResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${meal.strMeal}`);
                             const menuItemData = await menuItemResponse.json();
                             //const menuItem = menuItemData.meals && menuItemData.meals.length > 0 ? menuItemData.meals[0].strDetails : '';
-                            console.log(menuItemData);
                             return { ...meal, rating, menuItemDetails: menuItemData.meals ? menuItemData.meals[0] : null };
                         } catch (error) {
                             console.error('Error fetching menu item details:', error);
@@ -166,12 +127,10 @@ export default function Filters() {
         setIsPopupOpen(!isPopupOpen);
     };
 
-    // Pagination logic to slice the meals array based on the current page
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = meals.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Function to handle page change
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
 
@@ -179,8 +138,7 @@ export default function Filters() {
         <div className='py-5'>
             <h2 className='antialiased font-bold text-2xl break-words pb-4 pt-4'>Restaurants with online food delivery in Pune</h2>
             <div className="filter-buttons relative">
-                <button onClick={toggleDropdown} className="border border-solid border-gray-300 filter-btn ">
-                    {/* {selectedArea ? `Filter by ${selectedArea}` : "Filter by Area "} */}
+                <button onClick={toggleDropdown} className={`border border-solid border-gray-300 filter-btn ${selected ? 'selected' : ''}`}>
                     <div className='flex items-center'>
                         Filter by Area
                         <span className='pl-2'>
@@ -193,11 +151,6 @@ export default function Filters() {
 
                 {isOpen && <AreasDropdown areas={areas} handleAreaSelection={handleAreaSelection} applyFilters={applyFilters} selectedArea={selectedArea} clearSelection={clearSelection} />}
 
-                {/* <div className='flex items-center mt-4'>
-                    {selectedArea.length > 0 && (
-                        <div className='mr-2'>Selected Areas : {selectedArea.join(', ')}</div>
-                    )}
-                </div> */}
                 <SortDropdown handleSortByChange={handleSortByChange} />
 
                 <button className="border border-solid border-gray-300  filter-btn">
@@ -210,7 +163,7 @@ export default function Filters() {
                     Offers
                 </button>
             </div >
-            <div className="grid grid-cols-4 gap-8 py-5 pt-10">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 py-5 pt-10">
                 {meals !== null && (
                     currentItems.map(meal => (
                         <div key={meal.idMeal}>
@@ -223,9 +176,9 @@ export default function Filters() {
             {isPopupOpen && (
                 <Modal isPopupOpen={isPopupOpen} toggleModal={toggleModal} modalMeal={modalMeal} />
             )}
-            <div className="pagination">
+            <div className="pagination py-3 mb-4">
                 {meals.length > itemsPerPage && (
-                    <ul className="pagination-list flex items-center -space-x-px h-8 text-sm">
+                    <ul className="pagination-list flex justify-center items-center -space-x-px h-8 text-sm">
                         {Array.from({ length: Math.ceil(meals.length / itemsPerPage) }, (_, index) => (
                             <li key={index} className="pagination-item">
                                 <button onClick={() => paginate(index + 1)} className="pagination-link flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
@@ -236,9 +189,6 @@ export default function Filters() {
                     </ul>
                 )}
             </div>
-
-
-
 
         </div >
     )

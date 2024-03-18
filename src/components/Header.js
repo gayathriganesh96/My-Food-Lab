@@ -3,8 +3,8 @@ import React from "react";
 export default function Header() {
     return (
         <div class="bg-white-800 py-4 header-shadow fixed top-0 left-0 w-full bg-white">
-            <div class="container mx-auto px-4 md:px-0 flex justify-between items-center">
-                <div class="flex-shrink-0">
+            <div class="container mx-auto  sm:max-w-698 md:px-0 flex justify-between items-center">
+                <div class="flex-shrink-0 logo-image">
                     <img src="swiggy-logo.png" width="120" alt="Swiggy Logo" class="md:w-150" />
                 </div>
                 <div class="flex-shrink">

@@ -10,8 +10,8 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <div className="container mx-auto">
-        <div className="pt-20">
+      <div className="container mx-auto  sm:max-w-698">
+        <div className="pt-20 sm:max-w-698 sm:px-3">
           <Filters />
         </div>
       </div>
